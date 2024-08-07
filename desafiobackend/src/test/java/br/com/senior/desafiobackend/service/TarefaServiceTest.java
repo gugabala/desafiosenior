@@ -36,7 +36,7 @@ public class TarefaServiceTest {
     void getAllTarefas_returnsListOfTarefaDTOs() {
         Tarefa tarefa1 = new Tarefa(1L, "Titulo1", "Descricao1", LocalDateTime.now(), null, StatusTarefa.PENDENTE);
         Tarefa tarefa2 = new Tarefa(2L, "Titulo2", "Descricao2", LocalDateTime.now(), null, StatusTarefa.PENDENTE);
-        when(tarefaRepository.findAll()).thenReturn(Arrays.asList(tarefa1, tarefa2));
+        when(tarefaRepository.findAllTarefasOrdenadas()).thenReturn(Arrays.asList(tarefa1, tarefa2));
 
         List<TarefaDTO> result = tarefaService.getAllTarefas();
 

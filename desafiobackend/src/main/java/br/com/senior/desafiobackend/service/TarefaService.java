@@ -19,7 +19,7 @@ public class TarefaService {
     private TarefaRepository tarefaRepository;
 
     public List<TarefaDTO> getAllTarefas() {
-        return tarefaRepository.findAll().stream().map(TarefaDTO::convertToDTO).collect(Collectors.toList());
+        return tarefaRepository.findAllTarefasOrdenadas().stream().map(TarefaDTO::convertToDTO).collect(Collectors.toList());
     }
 
     public TarefaDTO getTarefaById(Long id) {
