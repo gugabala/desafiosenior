@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: desafiobackend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+  app:
+    image: openjdk:8-jdk-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ./mvnw spring-boot:run
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
