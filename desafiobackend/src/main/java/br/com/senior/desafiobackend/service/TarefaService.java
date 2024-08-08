@@ -17,48 +17,61 @@ public class TarefaService {
 
     @Autowired
     private TarefaRepository tarefaRepository;
-
     public List<TarefaDTO> getAllTarefas() {
         return tarefaRepository.findAllTarefasOrdenadas().stream().map(TarefaDTO::convertToDTO).collect(Collectors.toList());
     }
 
     public TarefaDTO getTarefaById(Long id) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + id));
+        Tarefa tarefa = getTarefa(id);
         return TarefaDTO.convertToDTO(tarefa);
     }
 
+    private Tarefa getTarefa(Long id) {
+        return tarefaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + id));
+    }
+
     public TarefaDTO createTarefa(TarefaDTO tarefaDTO) {
+        this.validateTituloDescricao(tarefaDTO.getTitulo(), tarefaDTO.getDescricao());
         Tarefa tarefa = Tarefa.convertToEntity(tarefaDTO);
-        tarefa.setDataCriacao(LocalDateTime.now());
+        this.criteriosCreate(tarefa);
         tarefaRepository.save(tarefa);
         return TarefaDTO.convertToDTO(tarefa);
     }
 
+    private void criteriosCreate(Tarefa tarefa) {
+        tarefa.setDataCriacao(LocalDateTime.now());
+        tarefa.setDataConclusao(null);
+        tarefa.setStatus(StatusTarefa.PENDENTE);
+    }
+
     public TarefaDTO updateTarefa(Long id, TarefaDTO tarefaDTO) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + id));
+        this.validateTituloDescricao(tarefaDTO.getTitulo(), tarefaDTO.getDescricao());
+        Tarefa tarefa = getTarefa(id);
+
+        this.criteriosUpdate(tarefaDTO, tarefa);
+
+        tarefaRepository.save(tarefa);
+
+        return TarefaDTO.convertToDTO(tarefa);
+    }
+
+    private  void criteriosUpdate(TarefaDTO tarefaDTO, Tarefa tarefa) {
 
         tarefa.setTitulo(tarefaDTO.getTitulo());
         tarefa.setDescricao(tarefaDTO.getDescricao());
         tarefa.setDataConclusao(tarefaDTO.getDataConclusao());
         tarefa.setStatus(tarefaDTO.getStatus());
-
-        tarefaRepository.save(tarefa);
-
-        return TarefaDTO.convertToDTO(tarefa);
     }
 
     public void deleteTarefa(Long id) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + id));
+        Tarefa tarefa = getTarefa(id);
 
         tarefaRepository.delete(tarefa);
     }
 
     public TarefaDTO concluirTarefa(Long id) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada com id " + id));
+        Tarefa tarefa = getTarefa(id);
 
         if (tarefa.getStatus().equals(StatusTarefa.CONCLUIDA)) {
             throw new ResourceNotFoundException("Tarefa já está concluída");
@@ -69,6 +82,14 @@ public class TarefaService {
 
         tarefaRepository.save(tarefa);
         return TarefaDTO.convertToDTO(tarefa);
+    }
+    private void validateTituloDescricao(String titulo, String descricao) {
+        if (titulo == null || titulo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Título não pode ser nulo ou vazio");
+        }
+        if (descricao == null || descricao.trim().isEmpty()) {
+            throw new IllegalArgumentException("Descrição não pode ser nula ou vazia");
+        }
     }
 
 }

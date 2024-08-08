@@ -3,6 +3,7 @@ package br.com.senior.desafiobackend.db.dto;
 import br.com.senior.desafiobackend.db.constates.StatusTarefa;
 import br.com.senior.desafiobackend.db.entity.Tarefa;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +18,9 @@ import java.time.LocalDateTime;
 public class TarefaDTO {
 
     private Long id;
+    @NotNull
     private String titulo;
+    @NotNull
     private String descricao;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
